@@ -8,10 +8,13 @@ public class GunTemporary : MonoBehaviour
     public float hitSus = 0.3f;
     public float scareDistance = 15.0f;
     public float fearCone = 15.0f;
+    public float recoil;
+
+    private WeaponSway sway;
     // Start is called before the first frame update
     void Start()
     {
-        
+        sway = GameObject.FindObjectOfType<WeaponSway>();
     }
 
     // Update is called once per frame
@@ -32,6 +35,8 @@ public class GunTemporary : MonoBehaviour
                     }
                 }
             }
+            
+            sway.AddRecoil(recoil);
         }
     }
 }

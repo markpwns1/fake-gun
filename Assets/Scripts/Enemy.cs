@@ -25,6 +25,8 @@ public class Enemy : MonoBehaviour
     public float spreadIntervalMin = 1.0f;
     public float spreadIntervalMax = 2.0f;
     public float shookDistance = 5.0f;
+    public Transform[] fleeLocations;
+    private bool fleeing = false;
     private GameObject player;
     private NavMeshAgent agent;
     private Vector3 destination;
@@ -181,7 +183,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(alerted) {
+        if(!fleeing && alerted) {
             var dest = GetFinalDestination();
             var destIgnoreY = IgnoreY(dest);
             var posIgnoreY = IgnoreY(transform.position);
@@ -219,7 +221,22 @@ public class Enemy : MonoBehaviour
 
     public void Spook(float amount) {
         fear += amount;
-        agent.speed = 0.0f;
+        if(fear < 1.0f) {
+            agent.speed = 0.0f;
+        }
+        else {
+            Flee();
+        }
+    }
+
+    void Flee() {
+        fleeing = true;
+        agent.speed = walkSpeed;
+        agent.isStopped = false;
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+        agent.SetDestination(fleeLocations[Random.Range(0, fleeLocations.Length)].position);
+        Debug.Log("FLEE!!");
     }
 
     public void Sus(float amount) {

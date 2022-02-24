@@ -24,6 +24,7 @@ public class PlayerMovement : MonoBehaviour {
     private bool mayJump = true;
     private bool jumpTimerTicking = false;
     private float jumpForce;
+    public bool IsMoving { get; private set; }
 
 	// Use this for initialization
 	void Start ()
@@ -133,6 +134,8 @@ public class PlayerMovement : MonoBehaviour {
             localVel_0.x = 0;
         }
 
+        IsMoving = fwd != 0 || side != 0;
+
         vel = transform.TransformDirection(localVel_0);
 
         var camFwd = transform.forward;
@@ -168,5 +171,13 @@ public class PlayerMovement : MonoBehaviour {
             a = Mathf.Min(0, a + b);
         }
         return a;
+    }
+
+    public bool IsSprinting() {
+        return sprinting;
+    }
+
+    public Rigidbody GetRigidbody() {
+        return rbody;
     }
 }
