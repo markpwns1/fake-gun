@@ -13,9 +13,19 @@ public class GunTemporary : MonoBehaviour
     public float visibleRecoil;
     public float recoilTimeLimit = 1.0f;
     public float requiredRecoilDegrees = 5.0f;
+    private float shotAngle = 0.0f;
+
+    [Header("Reload")]
+    public int clipSize = 6;
+    public float baseReloadFailSus = 0.1f;
+    public float reloadFailSusIncrease = 0.05f;
+
+    [Header("Misc")]
     public float fearCone = 15.0f;
-    private float shotAngle;
     // private bool hasntRecoiled = false;
+
+    private float tickingReloadFailSus;
+    private int bulletsShot = 0;
     private Coroutine recoilWaitCoroutine = null;
     // public float 
 
@@ -24,6 +34,7 @@ public class GunTemporary : MonoBehaviour
     void Start()
     {
         sway = GameObject.FindObjectOfType<WeaponSway>();
+        tickingReloadFailSus = baseReloadFailSus;
     }
 
     void FailedToRecoil() {
@@ -38,6 +49,11 @@ public class GunTemporary : MonoBehaviour
         yield return new WaitForSeconds(recoilTimeLimit);
         FailedToRecoil();
         recoilWaitCoroutine = null;
+    }
+
+    float GetHorizonAngle()
+    {
+        return Mathf.Abs(Vector3.SignedAngle(Vector3.up, Camera.main.transform.up, Camera.main.transform.forward));
     }
 
     void Update()
@@ -66,14 +82,29 @@ public class GunTemporary : MonoBehaviour
             
             sway.AddRecoil(visibleRecoil);
 
-            shotAngle = Camera.main.transform.localEulerAngles.x;
+            shotAngle = GetHorizonAngle();
             recoilWaitCoroutine = StartCoroutine(WaitForRecoil());
+
+            bulletsShot++;
+            if(bulletsShot > clipSize) {
+                foreach (var enemy in Enemy.alertedEnemies)
+                {
+                    enemy.Sus(tickingReloadFailSus);
+                }
+                Debug.Log("Sussy baka! " + tickingReloadFailSus);
+                tickingReloadFailSus += reloadFailSusIncrease;
+            }
         }
 
-        if(recoilWaitCoroutine != null && Camera.main.transform.localEulerAngles.x > shotAngle + requiredRecoilDegrees) {
+        if(recoilWaitCoroutine != null && GetHorizonAngle() > shotAngle + requiredRecoilDegrees) {
             Debug.Log("Successful recoil");
             StopCoroutine(recoilWaitCoroutine);
             recoilWaitCoroutine = null;
+        }
+
+        if(Input.GetKeyDown(KeyCode.R)) {
+            bulletsShot = 0;
+            tickingReloadFailSus = baseReloadFailSus;
         }
     }
 }
