@@ -12,7 +12,7 @@ public class Gun : MonoBehaviour
 
     public int magazine = 6;
     public float notReloadSus = 0.3f;
-    private int bullets_shot = 0;
+    private int bulletsShot = 0;
 
     public float recoilRequired = 0.1f;
     public float recoilTime = 0.5f;
@@ -36,7 +36,7 @@ public class Gun : MonoBehaviour
     void Update()
     {
         if(Input.GetMouseButtonDown(0)) {
-            bullets_shot++;
+            bulletsShot++;
             foreach (var enemy in Enemy.allEnemies)
             {
                 if(Physics.Raycast(Camera.main.transform.forward, Camera.main.transform.forward, out RaycastHit hit, scareDistance)) {
@@ -51,20 +51,20 @@ public class Gun : MonoBehaviour
                     }
                 }
 
-                if (bullets_shot > magazine) {
+                if (bulletsShot > magazine) {
                     enemy.Sus(notReloadSus);
                 }
                 
             }
             sway.AddRecoil(recoil);
             recoilStarted = true;
-            oldPosition = GameObject.FindGameObjectWithTag("MainCamera").transform.localRotation.x;
+            oldPosition = Camera.main.transform.localRotation.x;
         }
 
         if (recoilStarted) {
             if (recoilTimer > recoilTime) {
                 recoilStarted = false;
-                newPosition = GameObject.FindGameObjectWithTag("MainCamera").transform.localRotation.x;
+                newPosition = Camera.main.transform.localRotation.x;
                 float recoilDetected = oldPosition - newPosition;
                 if (recoilDetected < recoilRequired)
                 {
@@ -81,7 +81,7 @@ public class Gun : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.R)) {
-            bullets_shot = 0;
+            bulletsShot = 0;
         }
     }
 }

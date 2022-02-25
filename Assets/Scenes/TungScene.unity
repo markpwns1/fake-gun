@@ -544,7 +544,7 @@ MonoBehaviour:
   hitSus: 0.3
   scareDistance: 15
   fearCone: 15
-  recoil: 0
+  recoil: 0.5
   magazine: 6
   notReloadSus: 0.3
   recoilRequired: 0.1

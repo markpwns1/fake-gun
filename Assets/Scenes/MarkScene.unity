@@ -555,8 +555,11 @@ MonoBehaviour:
   glanceFear: 0.1
   hitSus: 0.3
   scareDistance: 15
+  noRecoilSus: 0.1
+  visibleRecoil: 0.5
+  recoilTimeLimit: 1
+  requiredRecoilDegrees: 5
   fearCone: 15
-  recoil: 1
 --- !u!1 &695708560
 GameObject:
   m_ObjectHideFlags: 0
