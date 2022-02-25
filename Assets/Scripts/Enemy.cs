@@ -25,6 +25,10 @@ public class Enemy : MonoBehaviour
     public float spreadIntervalMin = 1.0f;
     public float spreadIntervalMax = 2.0f;
     public float shookDistance = 5.0f;
+    public float attackIntervalMin = 1.0f;
+    public float attackIntervalMax = 2.0f;
+    public int damageMin = 8;
+    public int damageMax = 16;
     public Transform[] fleeLocations;
     private bool fleeing = false;
     private GameObject player;
@@ -34,6 +38,8 @@ public class Enemy : MonoBehaviour
     private bool pathCooldown = false;
     private int currentOrbitSlot = -1;
     private float fear = 0.0f;
+    private bool attacking = false;
+    private Health playerHealth;
     // Start is called before the first frame update
 
     void Awake() {
@@ -55,11 +61,12 @@ public class Enemy : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player");
-
+        playerHealth = GameObject.FindObjectOfType<Health>();
         allEnemies.Add(this);
         agent.updateRotation = false;
         AlertToPlayer(); // todo: alert when spotted
         StartCoroutine(Spread());
+        StartCoroutine(AttackLoop());
     }
 
     void AlertToPlayer() {
@@ -138,7 +145,7 @@ public class Enemy : MonoBehaviour
         while(true) {
 
             yield return new WaitUntil(() => {
-                if(!alerted) return false;
+                if(fleeing || !alerted) return false;
                 var dest = GetFinalDestination();
                 var destIgnoreY = IgnoreY(dest);
                 var posIgnoreY = IgnoreY(transform.position);
@@ -173,6 +180,29 @@ public class Enemy : MonoBehaviour
                     SetOrbitPos((currentOrbitSlot + 1) % ORBIT_POS_COUNT);
                 }
             }
+        }
+    }
+
+    IEnumerator AttackLoop() {
+        while(true) {
+            yield return new WaitUntil(() => {
+                if(fleeing || !alerted) return false;
+
+                var dest = GetFinalDestination();
+                var destIgnoreY = IgnoreY(dest);
+                var posIgnoreY = IgnoreY(transform.position);
+                var distFromDest = Vector3.Distance(destIgnoreY, posIgnoreY);
+
+                return distFromDest < closeEnough;
+            });
+
+            yield return new WaitForSeconds(Random.Range(attackIntervalMin, attackIntervalMax));
+
+            playerHealth.health -= Random.Range(damageMin, damageMax);
+            Debug.Log(playerHealth.health);
+            // attacking = true;
+            // yield return new WaitForSeconds(0.5f);
+            // attacking = false;
         }
     }
 
@@ -236,6 +266,7 @@ public class Enemy : MonoBehaviour
         agent.updatePosition = true;
         agent.updateRotation = true;
         agent.SetDestination(fleeLocations[Random.Range(0, fleeLocations.Length)].position);
+        
         Debug.Log("FLEE!!");
     }
 

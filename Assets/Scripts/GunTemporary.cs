@@ -7,7 +7,6 @@ public class GunTemporary : MonoBehaviour
     [Header("Sus")]
     public float glanceFear = 0.1f;
     public float hitSus = 0.3f;
-    public float scareDistance = 15.0f;
     public float noRecoilSus = 0.1f;
     [Header("Recoil")]
     public float visibleRecoil;
@@ -21,6 +20,7 @@ public class GunTemporary : MonoBehaviour
     public float reloadFailSusIncrease = 0.05f;
 
     [Header("Misc")]
+    public float scareDistance = 15.0f;
     public float fearCone = 15.0f;
     // private bool hasntRecoiled = false;
 

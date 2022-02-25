@@ -261,6 +261,10 @@ MonoBehaviour:
   spreadIntervalMin: 1
   spreadIntervalMax: 2
   shookDistance: 5
+  attackIntervalMin: 3
+  attackIntervalMax: 5
+  damageMin: 8
+  damageMax: 16
   fleeLocations:
   - {fileID: 636454960}
   - {fileID: 1868261858}
@@ -552,14 +556,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff8b4f54b6061284aaffebf2cdd66936, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  glanceFear: 0.1
+  glanceFear: 0.2
   hitSus: 0.3
-  scareDistance: 15
   noRecoilSus: 0.1
   visibleRecoil: 0.5
   recoilTimeLimit: 1
   requiredRecoilDegrees: 5
-  fearCone: 15
+  clipSize: 6
+  baseReloadFailSus: 0.1
+  reloadFailSusIncrease: 0.05
+  scareDistance: 15
+  fearCone: 30
+--- !u!114 &668496424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 668496414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0801480b46ae7942b6d707a2202a097, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  health: 100
 --- !u!1 &695708560
 GameObject:
   m_ObjectHideFlags: 0
@@ -923,6 +944,10 @@ MonoBehaviour:
   spreadIntervalMin: 1
   spreadIntervalMax: 2
   shookDistance: 5
+  attackIntervalMin: 3
+  attackIntervalMax: 5
+  damageMin: 8
+  damageMax: 16
   fleeLocations:
   - {fileID: 636454960}
   - {fileID: 1868261858}
@@ -1070,19 +1095,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4258208363626170, guid: 5a47d729df633354da5c2b7df3dde849, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9157016
       objectReference: {fileID: 0}
     - target: {fileID: 4258208363626170, guid: 5a47d729df633354da5c2b7df3dde849, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4258208363626170, guid: 5a47d729df633354da5c2b7df3dde849, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.40185896
       objectReference: {fileID: 0}
     - target: {fileID: 4258208363626170, guid: 5a47d729df633354da5c2b7df3dde849, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4258208363626170, guid: 5a47d729df633354da5c2b7df3dde849, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1090,7 +1115,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4258208363626170, guid: 5a47d729df633354da5c2b7df3dde849, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 47.389
       objectReference: {fileID: 0}
     - target: {fileID: 4258208363626170, guid: 5a47d729df633354da5c2b7df3dde849, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -1361,6 +1386,10 @@ MonoBehaviour:
   spreadIntervalMin: 1
   spreadIntervalMax: 2
   shookDistance: 5
+  attackIntervalMin: 3
+  attackIntervalMax: 5
+  damageMin: 8
+  damageMax: 16
   fleeLocations:
   - {fileID: 636454960}
   - {fileID: 1868261858}
