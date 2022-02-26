@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CluesManager : MonoBehaviour
@@ -34,12 +35,7 @@ public class CluesManager : MonoBehaviour
             }
         }
         else {
-            for (int i = numberOfClues - 1; i >= 0; i--) {
-                if (neededClues[i] == null) {
-                    neededClues.Remove(neededClues[i]);
-                    numberOfClues--;
-                }
-            }
+            neededClues = neededClues.Where(clue => clue != null).ToList();
         }
     }
 
