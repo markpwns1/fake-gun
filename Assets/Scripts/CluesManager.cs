@@ -49,4 +49,8 @@ public class CluesManager : MonoBehaviour
         }
         return ret;
     }
+
+    public int CluesLeft() {
+        return neededClues.Count();
+    }
 }
