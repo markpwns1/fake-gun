@@ -29,6 +29,8 @@ public class Enemy : MonoBehaviour
     public float attackIntervalMax = 2.0f;
     public int damageMin = 8;
     public int damageMax = 16;
+    public ParticleSystem exclamationMarks;
+    public ParticleSystem questionMarks;
     public Transform[] fleeLocations;
     private bool fleeing = false;
     private GameObject player;
@@ -39,6 +41,7 @@ public class Enemy : MonoBehaviour
     private int currentOrbitSlot = -1;
     private float fear = 0.0f;
     private bool attacking = false;
+    private float lastFear = 0.0f;
     private Health playerHealth;
     // Start is called before the first frame update
 
@@ -208,6 +211,20 @@ public class Enemy : MonoBehaviour
 
     void Update() {
         agent.speed = Mathf.MoveTowards(agent.speed, walkSpeed, 1.0f * Time.deltaTime);
+        
+    }
+
+    void LateUpdate() {
+        var deltaFear = fear - lastFear;
+
+        if(deltaFear > 0.0f) {
+            exclamationMarks.Emit(Mathf.CeilToInt(deltaFear / 0.15f));
+        }
+        else if(deltaFear < 0.0f) {
+            questionMarks.Emit(Mathf.CeilToInt(Mathf.Abs(deltaFear / 0.1f)));
+        }
+
+        lastFear = fear;
     }
 
     // Update is called once per frame
@@ -250,6 +267,8 @@ public class Enemy : MonoBehaviour
     }
 
     public void Spook(float amount) {
+        if(fear < -1.0f) return;
+
         fear += amount;
         if(fear < 1.0f) {
             agent.speed = 0.0f;
@@ -271,6 +290,7 @@ public class Enemy : MonoBehaviour
     }
 
     public void Sus(float amount) {
+        if(fear < -1.0f) return;
         fear -= amount;
     }
 }
