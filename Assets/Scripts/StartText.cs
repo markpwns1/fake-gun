@@ -13,7 +13,7 @@ public class StartText : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             FindObjectOfType<PlayerMovement>().enabled = true;
             FindObjectOfType<CameraMovement>().enabled = true;

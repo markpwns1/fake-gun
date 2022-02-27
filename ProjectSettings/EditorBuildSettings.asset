@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Shrubscene 2.unity
+    guid: a6e0a56cfd496ab4381f29aa3da81faf
   m_configObjects: {}

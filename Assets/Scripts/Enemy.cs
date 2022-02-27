@@ -169,7 +169,7 @@ public class Enemy : MonoBehaviour
                 agent.updateRotation = true;
             }
 
-            if(canAttack && Vector3.Distance(posIgnoreY, playerIgnoreY) < attackDistance) {
+            if(canAttack && Vector3.Distance(transform.position, player.transform.position) < attackDistance) {
                 StartCoroutine(AttackDelay());
                 playerHealth.health -= Random.Range(damageMin, damageMax);
                 playerHealth.Hurt();

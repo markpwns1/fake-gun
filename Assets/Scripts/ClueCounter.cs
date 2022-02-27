@@ -17,7 +17,7 @@ public class ClueCounter : MonoBehaviour
             GetComponent<Text>().text = (4 - cm.CluesLeft()) + " / 4 documents collected.\nLook for brown tables!";
         }
         else {
-            GetComponent<Text>().text = "All documents collected. Escape!";
+            GetComponent<Text>().text = "All documents collected. Get to the car!";
         }
     }
 }
