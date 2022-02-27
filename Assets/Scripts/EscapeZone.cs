@@ -42,5 +42,6 @@ public class EscapeZone : MonoBehaviour
 
     void Die() {
         dieText.SetActive(true);
+        dieText.GetComponent<DieScene>().Die();
     }
 }

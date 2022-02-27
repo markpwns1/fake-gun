@@ -12,4 +12,10 @@ public class DieScene : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
+
+    public void Die() {
+        FindObjectOfType<PlayerMovement>().enabled = false;
+        FindObjectOfType<CameraMovement>().enabled = false;
+        FindObjectOfType<WeaponSway>().enabled = false;
+    }
 }
