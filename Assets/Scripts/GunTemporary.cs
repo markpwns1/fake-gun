@@ -28,6 +28,9 @@ public class GunTemporary : MonoBehaviour
     [HideInInspector]
     public int bulletsShot = 0;
     private Coroutine recoilWaitCoroutine = null;
+    public AudioSource gunshot;
+    public ParticleSystem particles;
+    public GameObject muzzleFlash;
     // public float 
 
     private WeaponSway sway;
@@ -36,6 +39,8 @@ public class GunTemporary : MonoBehaviour
     {
         sway = GameObject.FindObjectOfType<WeaponSway>();
         tickingReloadFailSus = baseReloadFailSus;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void FailedToRecoil() {
@@ -44,6 +49,12 @@ public class GunTemporary : MonoBehaviour
             enemy.Sus(noRecoilSus);
         }
         Debug.Log("Failed recoil");
+    }
+
+    IEnumerator MuzzleFlash() {
+        muzzleFlash.SetActive(true);
+        yield return new WaitForSeconds(0.1f);
+        muzzleFlash.SetActive(false);
     }
 
     IEnumerator WaitForRecoil() {
@@ -71,12 +82,15 @@ public class GunTemporary : MonoBehaviour
                 Debug.Log(hit.collider.gameObject.name);
                 Debug.Log(hit.collider.gameObject.tag);
                 if(hit.collider.gameObject.tag == "Enemy") {
-                    Debug.Log("HIT");
+                    // Debug.Log("HIT");
                     hit.collider.gameObject.GetComponent<Enemy>().Sus(hitSus);
                 }
             }
 
-            Debug.DrawRay(Camera.main.transform.position, Camera.main.transform.forward);
+            gunshot.Play();
+            particles.Emit(10);
+            StartCoroutine(MuzzleFlash());
+            // Debug.DrawRay(Camera.main.transform.position, Camera.main.transform.forward);
 
             foreach (var enemy in Enemy.allEnemies)
             {
