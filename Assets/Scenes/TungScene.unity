@@ -329,6 +329,9 @@ MonoBehaviour:
   shookDistance: 5
   attackIntervalMin: 1
   attackIntervalMax: 2
+  attackDistance: 1
+  alertDistance: 15
+  scareAwayDistance: 7.5
   damageMin: 8
   damageMax: 16
   exclamationMarks: {fileID: 0}
@@ -336,6 +339,10 @@ MonoBehaviour:
   fleeLocations:
   - {fileID: 0}
   - {fileID: 0}
+  waypoints: []
+  angryParticles: {fileID: 0}
+  fearParticles: {fileID: 0}
+  fear: 0
 --- !u!195 &246139603
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -799,7 +806,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 668496414}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fc1e1679e5e94b4286dded380290216, type: 3}
+  m_Script: {fileID: 11500000, guid: ff8b4f54b6061284aaffebf2cdd66936, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   glanceFear: 0.1
@@ -813,6 +820,7 @@ MonoBehaviour:
   reloadFailSusIncrease: 0.05
   scareDistance: 15
   fearCone: 15
+  bulletsShot: 0
 --- !u!114 &668496416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -825,8 +833,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0801480b46ae7942b6d707a2202a097, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hurtFade: 1
   maxHealth: 100
   health: 100
+  hurt: {fileID: 0}
 --- !u!114 &668496422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1034,7 +1044,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1521261477877953697, guid: ab0319b8b7b14be4da066d354ae69ceb, type: 3}
   m_PrefabInstance: {fileID: 1521261478197495815}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &756300967
+--- !u!114 &756300970
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1313,6 +1323,9 @@ MonoBehaviour:
   shookDistance: 5
   attackIntervalMin: 1
   attackIntervalMax: 2
+  attackDistance: 1
+  alertDistance: 15
+  scareAwayDistance: 7.5
   damageMin: 8
   damageMax: 16
   exclamationMarks: {fileID: 0}
@@ -1320,6 +1333,10 @@ MonoBehaviour:
   fleeLocations:
   - {fileID: 0}
   - {fileID: 0}
+  waypoints: []
+  angryParticles: {fileID: 0}
+  fearParticles: {fileID: 0}
+  fear: 0
 --- !u!1001 &969260104
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1871,6 +1888,9 @@ MonoBehaviour:
   shookDistance: 5
   attackIntervalMin: 1
   attackIntervalMax: 2
+  attackDistance: 1
+  alertDistance: 15
+  scareAwayDistance: 7.5
   damageMin: 8
   damageMax: 16
   exclamationMarks: {fileID: 0}
@@ -1878,6 +1898,10 @@ MonoBehaviour:
   fleeLocations:
   - {fileID: 0}
   - {fileID: 0}
+  waypoints: []
+  angryParticles: {fileID: 0}
+  fearParticles: {fileID: 0}
+  fear: 0
 --- !u!195 &1388254096
 NavMeshAgent:
   m_ObjectHideFlags: 0
