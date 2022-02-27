@@ -4,23 +4,30 @@ using UnityEngine;
 
 public class Gun : MonoBehaviour
 {
+    [Header("Sus")]
     public float glanceFear = 0.1f;
     public float hitSus = 0.3f;
+    public float noRecoilSus = 0.1f;
+    [Header("Recoil")]
+    public float visibleRecoil;
+    public float recoilTimeLimit = 1.0f;
+    public float requiredRecoilDegrees = 5.0f;
+    private float shotAngle = 0.0f;
+
+    [Header("Reload")]
+    public int clipSize = 6;
+    public float baseReloadFailSus = 0.1f;
+    public float reloadFailSusIncrease = 0.05f;
+
+    [Header("Misc")]
     public float scareDistance = 15.0f;
     public float fearCone = 15.0f;
-    public float recoil;
+    // private bool hasntRecoiled = false;
 
-    public int magazine = 6;
-    public float notReloadSus = 0.3f;
+    private float tickingReloadFailSus;
     private int bulletsShot = 0;
-
-    public float recoilRequired = 0.1f;
-    public float recoilTime = 0.5f;
-    public float notRecoilSus = 0.3f;
-    private float recoilTimer;
-    private bool recoilStarted;
-    private float oldPosition;
-    private float newPosition;
+    private Coroutine recoilWaitCoroutine = null;
+    // public float 
 
     private WeaponSway sway;
     // Start is called before the first frame update
@@ -29,59 +36,92 @@ public class Gun : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         sway = GameObject.FindObjectOfType<WeaponSway>();
-        recoilTimer = 0.0f;
-        recoilStarted = false;
+        tickingReloadFailSus = baseReloadFailSus;
+    }
+
+    void FailedToRecoil()
+    {
+        foreach (var enemy in Enemy.alertedEnemies)
+        {
+            enemy.Sus(noRecoilSus);
+        }
+        Debug.Log("Failed recoil");
+    }
+
+    IEnumerator WaitForRecoil()
+    {
+        yield return new WaitForSeconds(recoilTimeLimit);
+        FailedToRecoil();
+        recoilWaitCoroutine = null;
+    }
+
+    float GetHorizonAngle()
+    {
+        return Mathf.Abs(Vector3.SignedAngle(Vector3.up, Camera.main.transform.up, Camera.main.transform.forward));
     }
 
     void Update()
     {
-        if(Input.GetMouseButtonDown(0)) {
-            bulletsShot++;
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (recoilWaitCoroutine != null)
+            {
+                StopCoroutine(recoilWaitCoroutine);
+                FailedToRecoil();
+                recoilWaitCoroutine = null;
+            }
+
             foreach (var enemy in Enemy.allEnemies)
             {
-                if(Physics.Raycast(Camera.main.transform.forward, Camera.main.transform.forward, out RaycastHit hit, scareDistance)) {
-                    if(hit.transform.gameObject.tag == "Enemy") {
+                if (Physics.Raycast(Camera.main.transform.forward, Camera.main.transform.forward, out RaycastHit hit, scareDistance))
+                {
+                    if (hit.transform.gameObject.tag == "Enemy")
+                    {
                         enemy.Sus(hitSus);
                     }
                 }
-                else {
+                else
+                {
                     var to = enemy.transform.position - transform.position;
-                    if(to.magnitude < scareDistance && Vector3.Angle(Camera.main.transform.forward, to) < fearCone) {
+                    if (to.magnitude < scareDistance && Vector3.Angle(Camera.main.transform.forward, to) < fearCone)
+                    {
                         enemy.Spook(glanceFear);
                     }
                 }
-
-                if (bulletsShot > magazine) {
-                    enemy.Sus(notReloadSus);
-                }
-                
             }
-            sway.AddRecoil(recoil);
-            recoilStarted = true;
-            oldPosition = Camera.main.transform.localRotation.x;
-        }
 
-        if (recoilStarted) {
-            if (recoilTimer > recoilTime) {
-                recoilStarted = false;
-                newPosition = Camera.main.transform.localRotation.x;
-                float recoilDetected = oldPosition - newPosition;
-                if (recoilDetected < recoilRequired)
+            sway.AddRecoil(visibleRecoil);
+
+            shotAngle = GetHorizonAngle();
+            recoilWaitCoroutine = StartCoroutine(WaitForRecoil());
+
+            bulletsShot++;
+            if (bulletsShot > clipSize)
+            {
+                foreach (var enemy in Enemy.alertedEnemies)
                 {
-                    foreach (var enemy in Enemy.allEnemies) enemy.Sus(notRecoilSus);
+                    enemy.Sus(tickingReloadFailSus);
                 }
-                else {
-                    Debug.Log("Cool");
-                }
-                recoilTimer = 0.0f;
-            }
-            else {
-                recoilTimer += Time.deltaTime;
+                Debug.Log("Sussy baka! " + tickingReloadFailSus);
+                tickingReloadFailSus += reloadFailSusIncrease;
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.R)) {
-            bulletsShot = 0;
+        if (recoilWaitCoroutine != null && GetHorizonAngle() > shotAngle + requiredRecoilDegrees)
+        {
+            Debug.Log("Successful recoil");
+            StopCoroutine(recoilWaitCoroutine);
+            recoilWaitCoroutine = null;
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            bulletsShot = 0;
+            tickingReloadFailSus = baseReloadFailSus;
+        }
+    }
+
+    public int BulletShot() {
+        return bulletsShot;
     }
 }
