@@ -9,34 +9,36 @@ public class Soundtrack : MonoBehaviour
     public AudioClip music3;
     private CluesManager cm;
     private AudioSource audioSource;
+    private bool played = false;
 
     // Start is called before the first frame update
     void Start()
     {
         audioSource = gameObject.GetComponent<AudioSource>();
         cm = GameObject.FindObjectOfType<CluesManager>();
+        audioSource.Stop();
+        audioSource.clip = music1;
+        audioSource.Play();
+        audioSource.loop = true;
     }
 
     // Update is called once per frame
     public void MusicChange()
     {
-        if (cm.CluesLeft() == 4)
+        if ((cm.CluesLeft() > 0 & cm.CluesLeft() < 4) & (played == false))
             {
                 audioSource.Stop();
+                audioSource.clip = music2;
+                audioSource.Play();
                 audioSource.loop = true;
-                audioSource.PlayOneShot(music1);
+                played = true;
             }
-        else if (cm.CluesLeft() > 0 & cm.CluesLeft() < 4)
+        else if (cm.CluesLeft() == 0)
             {
                 audioSource.Stop();
+                audioSource.clip = music3;
+                audioSource.Play();
                 audioSource.loop = true;
-                audioSource.PlayOneShot(music2);
-            }
-        else
-            {
-                audioSource.Stop();
-                audioSource.loop = true;
-                audioSource.PlayOneShot(music3);
             }
     }
 }
