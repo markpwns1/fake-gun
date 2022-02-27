@@ -27,11 +27,15 @@ public class Enemy : MonoBehaviour
     public float attackIntervalMax = 2.0f;
     public float attackDistance = 1.0f;
     public float alertDistance = 15.0f;
+    public float scareAwayDistance = 7.5f;
     public int damageMin = 8;
     public int damageMax = 16;
     public ParticleSystem exclamationMarks;
     public ParticleSystem questionMarks;
     public Transform[] fleeLocations;
+    public Transform[] waypoints;
+    public GameObject angryParticles;
+    public GameObject fearParticles;
     private bool fleeing = false;
     private GameObject player;
     private NavMeshAgent agent;
@@ -39,12 +43,19 @@ public class Enemy : MonoBehaviour
     private bool alerted = false;
     private bool pathCooldown = false;
     private int currentOrbitSlot = -1;
-    private float fear = 0.0f;
+    public float fear = 0.0f;
     private bool attacking = false;
+    private bool canAttack = true;
     private float lastFear = 0.0f;
     private Vector3 fleePos;
     private Health playerHealth;
     // Start is called before the first frame update
+
+    IEnumerator AttackDelay() {
+        canAttack = false;
+        yield return new WaitForSeconds(1.0f);
+        canAttack = true;
+    }
 
     void Start()
     {
@@ -52,7 +63,8 @@ public class Enemy : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         playerHealth = GameObject.FindObjectOfType<Health>();
         allEnemies.Add(this);
-        agent.updateRotation = false;
+        agent.updateRotation = true;
+        agent.destination = waypoints[Random.Range(0, waypoints.Length)].position;
         // AlertToPlayer(); // todo: alert when spotted
         // StartCoroutine(AttackLoop());
     }
@@ -157,8 +169,10 @@ public class Enemy : MonoBehaviour
                 agent.updateRotation = true;
             }
 
-            if(Vector3.Distance(posIgnoreY, playerIgnoreY) < attackDistance) {
+            if(canAttack && Vector3.Distance(posIgnoreY, playerIgnoreY) < attackDistance) {
+                StartCoroutine(AttackDelay());
                 playerHealth.health -= Random.Range(damageMin, damageMax);
+                playerHealth.Hurt();
                 // Debug.Log(playerHealth.health);
                 agent.speed = 0;
             }
@@ -177,10 +191,25 @@ public class Enemy : MonoBehaviour
                     AlertToPlayer();
                 }
             }
+
+            if(Vector3.Distance(transform.position, agent.destination) < 2.0f) {
+                agent.destination = waypoints[Random.Range(0, waypoints.Length)].position;
+            }
         }
     }
 
     public void Spook(float amount) {
+        if(!alerted) {
+            var diff = player.transform.position - transform.position;
+            if(diff.magnitude < scareAwayDistance) {
+                Flee();
+                return;
+            }
+            else if(Physics.Raycast(transform.position, diff.normalized, out RaycastHit hit, alertDistance) && hit.collider.gameObject.tag == "Player") {
+                AlertToPlayer();
+            }
+        }
+
         if(fear < -1.0f) return;
 
         fear += amount;
@@ -201,6 +230,7 @@ public class Enemy : MonoBehaviour
         fleePos = fleeLocations[Random.Range(0, fleeLocations.Length)].position;
         agent.SetDestination(fleePos);
         alertedEnemies.Remove(this);
+        fearParticles.SetActive(true);
         
         Debug.Log("FLEE!!");
     }
@@ -208,5 +238,9 @@ public class Enemy : MonoBehaviour
     public void Sus(float amount) {
         if(fear < -1.0f) return;
         fear -= amount;
+
+        if(fear < -1.0f) {
+            angryParticles.SetActive(true);
+        }
     }
 }

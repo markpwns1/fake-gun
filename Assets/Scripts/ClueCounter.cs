@@ -14,10 +14,10 @@ public class ClueCounter : MonoBehaviour
     {
         if (cm.CluesLeft() > 0)
         {
-            GetComponent<Text>().text = cm.CluesLeft().ToString() + " clues left";
+            GetComponent<Text>().text = (4 - cm.CluesLeft()) + " / 4 documents collected.\nLook for brown tables!";
         }
         else {
-            GetComponent<Text>().text = "Clue collection completed. Escape!";
+            GetComponent<Text>().text = "All documents collected. Escape!";
         }
     }
 }

@@ -5,16 +5,16 @@ using UnityEngine.UI;
 
 public class ShotCounter : MonoBehaviour
 {
-    public GunTemporary gun;
-    public GameObject warningText;
+    private GunTemporary gun;
+    private GameObject warningText;
 
     IEnumerator FlashingCoroutine()
     {
         while (true)
         {
-            warningText.GetComponent<Text>().color = Color.white;
+            warningText.GetComponent<Text>().color = new Color(0, 0, 0, 0);
             yield return new WaitForSeconds(0.5f);
-            warningText.GetComponent<Text>().color = Color.red;
+            warningText.GetComponent<Text>().color = new Color(0, 0, 0, 1);
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -23,6 +23,8 @@ public class ShotCounter : MonoBehaviour
     {
         gun = FindObjectOfType<GunTemporary>();
         warningText = GameObject.FindGameObjectWithTag("Warning");
+        warningText.SetActive(true);
+        var c = StartCoroutine(FlashingCoroutine());
         warningText.SetActive(false);
     }
 
@@ -32,7 +34,6 @@ public class ShotCounter : MonoBehaviour
         if (gun.bulletsShot >= gun.clipSize)
         {
             warningText.SetActive(true);
-            var c = StartCoroutine(FlashingCoroutine());
         }
         else {
             warningText.SetActive(false);

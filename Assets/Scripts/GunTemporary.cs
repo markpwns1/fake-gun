@@ -66,19 +66,26 @@ public class GunTemporary : MonoBehaviour
                 recoilWaitCoroutine = null;
             }
 
+            if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, scareDistance)) {
+                
+                Debug.Log(hit.collider.gameObject.name);
+                Debug.Log(hit.collider.gameObject.tag);
+                if(hit.collider.gameObject.tag == "Enemy") {
+                    Debug.Log("HIT");
+                    hit.collider.gameObject.GetComponent<Enemy>().Sus(hitSus);
+                }
+            }
+
+            Debug.DrawRay(Camera.main.transform.position, Camera.main.transform.forward);
+
             foreach (var enemy in Enemy.allEnemies)
             {
-                if(Physics.Raycast(Camera.main.transform.forward, Camera.main.transform.forward, out RaycastHit hit, scareDistance)) {
-                    if(hit.transform.gameObject.tag == "Enemy") {
-                        enemy.Sus(hitSus);
-                    }
+                
+                var to = enemy.transform.position - transform.position;
+                if(to.magnitude < scareDistance && Vector3.Angle(Camera.main.transform.forward, to) < fearCone) {
+                    enemy.Spook(glanceFear);
                 }
-                else {
-                    var to = enemy.transform.position - transform.position;
-                    if(to.magnitude < scareDistance && Vector3.Angle(Camera.main.transform.forward, to) < fearCone) {
-                        enemy.Spook(glanceFear);
-                    }
-                }
+                
             }
             
             sway.AddRecoil(visibleRecoil);

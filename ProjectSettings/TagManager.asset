@@ -8,6 +8,7 @@ TagManager:
   - Win
   - Die
   - Warning
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -15,7 +16,7 @@ TagManager:
   - PP
   - Water
   - UI
-  - 
+  - Enemy
   - 
   - 
   - 
