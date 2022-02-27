@@ -6,13 +6,18 @@ using UnityEngine;
 public class CluesManager : MonoBehaviour
 {
     public int numberOfClues;
+
+    private Soundtrack st;
+
     private List<Clue> neededClues;
     private bool clueProcessed;
+    private int lastCluesLeft;
 
     void Start()
     {
         clueProcessed = false;
         neededClues = new List<Clue>();
+        st = FindObjectOfType<Soundtrack>();
     }
 
     void Update()
@@ -35,7 +40,11 @@ public class CluesManager : MonoBehaviour
             }
         }
         else {
+            lastCluesLeft = neededClues.Count();
             neededClues = neededClues.Where(clue => clue != null).ToList();
+            if (lastCluesLeft != neededClues.Count) {
+                st.MusicChange();
+            }
         }
     }
 
