@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ShotCounter : MonoBehaviour
 {
-    public Gun gun;
+    public GunTemporary gun;
     public GameObject warningText;
 
     IEnumerator FlashingCoroutine()
@@ -21,15 +21,15 @@ public class ShotCounter : MonoBehaviour
 
     void Start()
     {
-        gun = FindObjectOfType<Gun>();
+        gun = FindObjectOfType<GunTemporary>();
         warningText = GameObject.FindGameObjectWithTag("Warning");
         warningText.SetActive(false);
     }
 
     void Update()
     {
-        GetComponent<Text>().text = (gun.clipSize - gun.BulletShot()).ToString() + " / " + gun.clipSize;
-        if (gun.BulletShot() >= gun.clipSize)
+        GetComponent<Text>().text = (gun.clipSize - gun.bulletsShot).ToString() + " / " + gun.clipSize;
+        if (gun.bulletsShot >= gun.clipSize)
         {
             warningText.SetActive(true);
             var c = StartCoroutine(FlashingCoroutine());

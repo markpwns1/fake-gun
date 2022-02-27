@@ -25,7 +25,8 @@ public class GunTemporary : MonoBehaviour
     // private bool hasntRecoiled = false;
 
     private float tickingReloadFailSus;
-    private int bulletsShot = 0;
+    [HideInInspector]
+    public int bulletsShot = 0;
     private Coroutine recoilWaitCoroutine = null;
     // public float 
 

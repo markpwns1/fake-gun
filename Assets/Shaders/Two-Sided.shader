@@ -28,5 +28,5 @@
  ENDCG
  }
  
- Fallback "Transparent/Cutout/VertexLit"
+ Fallback "Legacy Shaders/Transparent/Cutout/Diffuse"
  }

@@ -7,8 +7,6 @@ using UnityEngine.AI;
 public class Enemy : MonoBehaviour
 {
     public const int ORBIT_POS_COUNT = 10;
-    public static Vector3[] orbitPositions = new Vector3[ORBIT_POS_COUNT];
-    public static Enemy[] orbitSlots = new Enemy[ORBIT_POS_COUNT];
     public static List<Enemy> alertedEnemies = new List<Enemy>();
     public static List<Enemy> allEnemies = new List<Enemy>();
     public static bool initialisedOrbitPositions = false;
@@ -27,6 +25,8 @@ public class Enemy : MonoBehaviour
     public float shookDistance = 5.0f;
     public float attackIntervalMin = 1.0f;
     public float attackIntervalMax = 2.0f;
+    public float attackDistance = 1.0f;
+    public float alertDistance = 15.0f;
     public int damageMin = 8;
     public int damageMax = 16;
     public ParticleSystem exclamationMarks;
@@ -42,23 +42,9 @@ public class Enemy : MonoBehaviour
     private float fear = 0.0f;
     private bool attacking = false;
     private float lastFear = 0.0f;
+    private Vector3 fleePos;
     private Health playerHealth;
     // Start is called before the first frame update
-
-    void Awake() {
-        if(initialisedOrbitPositions) return;
-
-        initialisedOrbitPositions = true;
-        for (int i = 0; i < ORBIT_POS_COUNT; i++)
-        {
-            var pos = Vector3.zero;
-            var theta = 2.0f * Mathf.PI * (i / (float) ORBIT_POS_COUNT);
-            pos.x = Mathf.Cos(theta);
-            pos.z = Mathf.Sin(theta);
-            pos *= Random.Range(orbitRadiusMin, orbitRadiusMax);
-            orbitPositions[i] = pos;
-        }
-    }
 
     void Start()
     {
@@ -67,64 +53,20 @@ public class Enemy : MonoBehaviour
         playerHealth = GameObject.FindObjectOfType<Health>();
         allEnemies.Add(this);
         agent.updateRotation = false;
-        AlertToPlayer(); // todo: alert when spotted
-        StartCoroutine(Spread());
-        StartCoroutine(AttackLoop());
+        // AlertToPlayer(); // todo: alert when spotted
+        // StartCoroutine(AttackLoop());
     }
 
     void AlertToPlayer() {
-        if(FindNewOrbitPos()) {
-            alerted = true;
-            alertedEnemies.Add(this);
-        }
-    }
-
-    int GetIdealOrbitSlot() {
-        int minI = -1;
-        float minDist = 10000.0f;
-        for (int i = 0; i < ORBIT_POS_COUNT; i++)
-        {
-            var dist = Vector3.Distance(GetOrbitPos(i), IgnoreY(transform.position));
-            if(orbitSlots[i] == null && dist < minDist) {
-                minDist = dist;
-                minI = i;
-            }
-        }
-        return minI;
-    }
-
-    bool FindNewOrbitPos() {
-        var i = GetIdealOrbitSlot();
-
-        if(i != -1) {
-            destination = orbitPositions[i];
-            orbitSlots[i] = this;
-            currentOrbitSlot = i;
-            return true;
-        }
-        return false;
-    }
-
-    void SetOrbitPos(int slot) {
-        if(currentOrbitSlot != -1) {
-            orbitSlots[currentOrbitSlot] = null;
-        }
-
-        currentOrbitSlot = slot;
-
-        if(slot != -1) {
-            orbitSlots[currentOrbitSlot] = this;
-            destination = orbitPositions[currentOrbitSlot];
-        }
+        alerted = true;
+        alertedEnemies.Add(this);
+        exclamationMarks.Emit(1);
     }
 
     Vector3 GetFinalDestination() {
-        return player.transform.position + destination;
+        return player.transform.position;
     }
 
-    Vector3 GetOrbitPos(int i) {
-        return IgnoreY(player.transform.position + orbitPositions[i]);
-    }
 
     IEnumerator RequestUpdatePath() {
         if(!pathCooldown) {
@@ -144,70 +86,28 @@ public class Enemy : MonoBehaviour
         return (x % m + m) % m;
     }
 
-    IEnumerator Spread() {
-        while(true) {
+    // IEnumerator AttackLoop() {
+    //     while(true) {
+    //         yield return new WaitUntil(() => {
+    //             if(fleeing || !alerted) return false;
 
-            yield return new WaitUntil(() => {
-                if(fleeing || !alerted) return false;
-                var dest = GetFinalDestination();
-                var destIgnoreY = IgnoreY(dest);
-                var posIgnoreY = IgnoreY(transform.position);
-                var distFromDest = Vector3.Distance(destIgnoreY, posIgnoreY);
+    //             var dest = GetFinalDestination();
+    //             var destIgnoreY = IgnoreY(dest);
+    //             var posIgnoreY = IgnoreY(transform.position);
+    //             var distFromDest = Vector3.Distance(destIgnoreY, posIgnoreY);
 
-                return distFromDest < pathfindDistance;
-            });
+    //             return distFromDest < closeEnough;
+    //         });
 
-            yield return new WaitForSeconds(Random.Range(spreadIntervalMin, spreadIntervalMax));
+    //         yield return new WaitForSeconds(Random.Range(attackIntervalMin, attackIntervalMax));
 
-            int distLeft = 0;
-            for (int i = mod(currentOrbitSlot - 1, ORBIT_POS_COUNT); i != currentOrbitSlot; i = mod(i - 1, ORBIT_POS_COUNT))
-            {
-                if(orbitSlots[mod(i, ORBIT_POS_COUNT)] == null)
-                    distLeft++;
-                else break;
-            }
-
-            int distRight = 0;
-            for (int i = (currentOrbitSlot + 1) % ORBIT_POS_COUNT; i != currentOrbitSlot; i = (i + 1) % ORBIT_POS_COUNT)
-            {
-                if(orbitSlots[i % ORBIT_POS_COUNT] == null)
-                    distRight++;
-                else break;
-            }
-
-            if(distLeft > 0 || distRight > 0) {
-                if(distLeft - distRight > 1) {
-                    SetOrbitPos(mod(currentOrbitSlot - 1, ORBIT_POS_COUNT));
-                }
-                else if(distRight - distLeft > 1) {
-                    SetOrbitPos((currentOrbitSlot + 1) % ORBIT_POS_COUNT);
-                }
-            }
-        }
-    }
-
-    IEnumerator AttackLoop() {
-        while(true) {
-            yield return new WaitUntil(() => {
-                if(fleeing || !alerted) return false;
-
-                var dest = GetFinalDestination();
-                var destIgnoreY = IgnoreY(dest);
-                var posIgnoreY = IgnoreY(transform.position);
-                var distFromDest = Vector3.Distance(destIgnoreY, posIgnoreY);
-
-                return distFromDest < closeEnough;
-            });
-
-            yield return new WaitForSeconds(Random.Range(attackIntervalMin, attackIntervalMax));
-
-            playerHealth.health -= Random.Range(damageMin, damageMax);
-            Debug.Log(playerHealth.health);
-            // attacking = true;
-            // yield return new WaitForSeconds(0.5f);
-            // attacking = false;
-        }
-    }
+    //         playerHealth.health -= Random.Range(damageMin, damageMax);
+    //         Debug.Log(playerHealth.health);
+    //         // attacking = true;
+    //         // yield return new WaitForSeconds(0.5f);
+    //         // attacking = false;
+    //     }
+    // }
 
     void Update() {
         agent.speed = Mathf.MoveTowards(agent.speed, walkSpeed, 1.0f * Time.deltaTime);
@@ -230,22 +130,15 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(!fleeing && alerted) {
-            var dest = GetFinalDestination();
-            var destIgnoreY = IgnoreY(dest);
-            var posIgnoreY = IgnoreY(transform.position);
-            var playerIgnoreY = IgnoreY(player.transform.position);
-            var distFromDest = Vector3.Distance(destIgnoreY, posIgnoreY);
+        var dest = GetFinalDestination();
+        var destIgnoreY = IgnoreY(dest);
+        var posIgnoreY = IgnoreY(transform.position);
+        var playerIgnoreY = IgnoreY(player.transform.position);
+        var distFromDest = Vector3.Distance(destIgnoreY, posIgnoreY);
 
+        if(!fleeing && alerted) {
             
             if(distFromDest > pathfindDistance) {
-                if(distFromDest > shookDistance) {
-                    orbitSlots[currentOrbitSlot] = null;
-                    currentOrbitSlot = -1;
-
-                    FindNewOrbitPos();
-                }
-
                 agent.isStopped = false;
                 StartCoroutine(RequestUpdatePath());
             }
@@ -262,6 +155,27 @@ public class Enemy : MonoBehaviour
             }
             else {
                 agent.updateRotation = true;
+            }
+
+            if(Vector3.Distance(posIgnoreY, playerIgnoreY) < attackDistance) {
+                playerHealth.health -= Random.Range(damageMin, damageMax);
+                // Debug.Log(playerHealth.health);
+                agent.speed = 0;
+            }
+
+        }
+        else if(fleeing) {
+            if(Vector3.Distance(fleePos, transform.position) < 2.0f) {
+                allEnemies.Remove(this);
+                Destroy(gameObject);
+            }
+        }
+        else if(!alerted) {
+            var diff = player.transform.position - transform.position;
+            if(Vector3.Angle(diff, transform.forward) < 45.0f && Physics.Raycast(transform.position, diff.normalized, out RaycastHit hit, alertDistance)) {
+                if(hit.transform.gameObject.tag == "Player") {
+                    AlertToPlayer();
+                }
             }
         }
     }
@@ -284,7 +198,9 @@ public class Enemy : MonoBehaviour
         agent.isStopped = false;
         agent.updatePosition = true;
         agent.updateRotation = true;
-        agent.SetDestination(fleeLocations[Random.Range(0, fleeLocations.Length)].position);
+        fleePos = fleeLocations[Random.Range(0, fleeLocations.Length)].position;
+        agent.SetDestination(fleePos);
+        alertedEnemies.Remove(this);
         
         Debug.Log("FLEE!!");
     }
